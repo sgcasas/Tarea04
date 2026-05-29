@@ -23,6 +23,9 @@ int main(){
     cout << "Vector (size): " << numbers.size() << endl;
     auto start = chrono::high_resolution_clock::now();
     // Aqui debe ir el algoritmo de ordenamiento...
+
+    sort(numbers.begin(), numbers.end());
+
     auto end = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
     cout << "Tiempo: " << duration.count() << " mili." << endl;
