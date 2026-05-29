@@ -1,0 +1,58 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <chrono>
+#include <algorithm>
+#include <omp.h>
+using namespace std;
+
+bool validar_orden(const vector<float>& vec){
+    for(size_t i = 1; i < vec.size(); ++i){
+        if(vec[i] < vec[i-1]) return false;
+    }
+    return true;
+}
+
+void parallel_sort(vector<float>& arr, int left, int right, int depth = 0){
+    if(right - left <= 10000 || depth > 4){
+        sort(arr.begin() + left, arr.begin() + right);
+        return;
+    }
+    int mid = left + (right - left) / 2;
+
+#pragma omp parallel sections
+    {
+#pragma omp section
+        parallel_sort(arr, left, mid, depth + 1);
+#pragma omp section
+        parallel_sort(arr, mid, right, depth + 1);
+    }
+
+    inplace_merge(arr.begin() + left, arr.begin() + mid, arr.begin() + right);
+}
+
+int main(){
+    vector<float> numbers;
+    ifstream in("output.txt");
+    float num;
+    while(in >> num) numbers.push_back(num);
+    in.close();
+
+    cout << "Vector (size): " << numbers.size() << endl;
+
+    auto start = chrono::high_resolution_clock::now();
+
+    parallel_sort(numbers, 0, numbers.size());
+
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+    cout << "Tiempo: " << duration.count() << " mili." << endl;
+    cout << "Ordenado: " << (validar_orden(numbers) ? "Si" : "No") << endl;
+
+    cout << "Primeros 10: ";
+    for(int i = 0; i < 10; i++)
+        cout << numbers[i] << " ";
+    cout << endl;
+
+    return 0;
+}
