@@ -3,6 +3,8 @@
 #include <fstream>
 #include <vector>
 #include <chrono>
+#include <algorithm>
+
 using namespace std;
 bool validar_orden(const vector<float>& vec){
     for(size_t i = 1; i < vec.size(); ++i){
